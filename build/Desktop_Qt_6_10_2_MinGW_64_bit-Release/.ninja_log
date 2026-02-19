@@ -1,0 +1,9 @@
+# ninja log v6
+11	2496	7932219172905987	surebetcalc_autogen/timestamp	400f23566f984cd7
+11	2496	7932219172905987	surebetcalc_autogen/mocs_compilation.cpp	400f23566f984cd7
+11	2496	7932219172905987	C:/Users/tutekxd123/Documents/surebetcalc/build/Desktop_Qt_6_10_2_MinGW_64_bit-Release/surebetcalc_autogen/timestamp	400f23566f984cd7
+11	2496	7932219172905987	C:/Users/tutekxd123/Documents/surebetcalc/build/Desktop_Qt_6_10_2_MinGW_64_bit-Release/surebetcalc_autogen/mocs_compilation.cpp	400f23566f984cd7
+2501	4277	7932219173364449	CMakeFiles/surebetcalc.dir/main.cpp.obj	f23a868b5c597887
+2500	4278	7932219173354485	CMakeFiles/surebetcalc.dir/surebetcalc_autogen/mocs_compilation.cpp.obj	cf317dd374cc6aac
+2502	4816	7932219173384383	CMakeFiles/surebetcalc.dir/mainwindow.cpp.obj	f79415f184031c2c
+4816	5040	7932219196517897	surebetcalc.exe	9d2d12ec676b4721
