@@ -2,9 +2,11 @@
 #include "./ui_mainwindow.h"
 
 
-void  MainWindow::CalculateOdds(int row, int col){
+void MainWindow::CalculateOdds(int row, int col){
     double value = ui->tableWidget->item(row,col)->text().toDouble();
     if(value<=0) return;
+    bool laychecked = ((QCheckBox*)ui->tableWidget->cellWidget(row,8))->isChecked();
+    if(!laychecked) return;
     double newvalue = value/(value-1);
     int coltochange = col==0? 5:0;
     ui->tableWidget->blockSignals(true);
@@ -22,7 +24,33 @@ void MainWindow::onTableItemChanged(QTableWidgetItem* item){
     }
 }
 
+void MainWindow::ResetTable(){
+    int row = ui->tableWidget->rowCount();
+    while(row>0){
+        ui->tableWidget->removeRow(0);
+        row = ui->tableWidget->rowCount();
+    }
+    //Remove All Rows
 
+    //Startowe Rows!
+    MainWindow::addRow();
+    MainWindow::addRow();
+    ui->tableWidget->blockSignals(true);
+    ui->tableWidget->item(0,3)->setText("12");
+    ui->tableWidget->item(1,3)->setText("3");
+    //Ustawienie marzy domyslnej
+    ((QComboBox*)ui->tableWidget->cellWidget(0,4))->setCurrentText("Bet");
+    ((QComboBox*)ui->tableWidget->cellWidget(1,4))->setCurrentText("Win");
+    //Ustawienie typu domyslnego
+    ((QComboBox*)ui->tableWidget->cellWidget(0,7))->setCurrentText("PLN");
+    ((QComboBox*)ui->tableWidget->cellWidget(1,7))->setCurrentText("EUR");
+    //ustawienie walut
+
+    //Domyslnie Lay ON
+    ((QCheckBox*)ui->tableWidget->cellWidget(1,8))->setChecked(true);
+    ui->tableWidget->blockSignals(false);
+    //Zmienmy wartości recznie
+}
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -34,12 +62,13 @@ MainWindow::MainWindow(QWidget *parent)
     manager->get(QNetworkRequest(QUrl("https://api.nbp.pl/api/exchangerates/rates/a/EUR/?format=JSON")));
     ui->setupUi(this);
     ui->tableWidget->setColumnCount(9);
-    ui->tableWidget->setHorizontalHeaderLabels({"Odd","Real Odd", "Stake","Commision(%)","Type","Kurs Lay","Liability Lay","Waluta","Lay?"});
+    ui->tableWidget->setHorizontalHeaderLabels({"Kurs","Rzeczywisty", "Stawka","Podatek(%)","Typ","Kurs Lay","Ryzyko Lay","Waluta","Lay?"});
     //Tylko jeden Row Select
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     connect(ui->tableWidget, &QTableWidget::itemChanged,this, &MainWindow::onTableItemChanged);
-    MainWindow::addRow();
+    MainWindow::ResetTable();
+    //MainWindow::addRow();
 
 
 }
@@ -84,6 +113,11 @@ void MainWindow::updateKurs(QNetworkReply* reply)
     reply->deleteLater();
 }
 
+QTableWidgetItem* createCenterText(){
+    QTableWidgetItem* item = new QTableWidgetItem("");
+    item->setTextAlignment(Qt::AlignCenter);
+    return item;
+}
 
 void MainWindow::on_pushButton_clicked()
 {
@@ -182,10 +216,8 @@ void MainWindow::calcResult(){
     for(int i=0;i<rows;i++){
         //getEffectiveOdd
         double effectiveOdd = ui->tableWidget->item(i,1)->text().toDouble();
-        double OddLay = ui->tableWidget->item(i,5)->text().toDouble();
         double kurs =  ui->tableWidget->item(i,0)->text().toDouble();
         bool CalcOddLay = ((QCheckBox*)ui->tableWidget->cellWidget(i,8))->isChecked();
-        double commission = ui->tableWidget->item(i,3)->text().toDouble() / 100.0;
         std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,7)))->currentText().toStdString();
         double stake = 0;
         double libaility =  0;
@@ -261,16 +293,18 @@ void MainWindow::addRow()
     auto comboTyp = new QComboBox();
     comboTyp->addItems({"Bet","Win"});
     auto comboWaluta = new QComboBox();
+    auto checkbox = new QCheckBox();
+    checkbox->setStyleSheet("margin-left:50%; margin-right:50%;");
     comboWaluta->addItems({"PLN","EUR"});
-    ui->tableWidget->setItem(row,0,new QTableWidgetItem(""));
-    ui->tableWidget->setItem(row,1,new QTableWidgetItem(""));
-    ui->tableWidget->setItem(row,2,new QTableWidgetItem(""));
-    ui->tableWidget->setItem(row,3,new QTableWidgetItem(""));
+    ui->tableWidget->setItem(row,0,createCenterText());
+    ui->tableWidget->setItem(row,1,createCenterText());
+    ui->tableWidget->setItem(row,2,createCenterText());
+    ui->tableWidget->setItem(row,3,createCenterText());
     ui->tableWidget->setCellWidget(row, 4, comboTyp);
-    ui->tableWidget->setItem(row,5,new QTableWidgetItem(""));
-    ui->tableWidget->setItem(row,6,new QTableWidgetItem(""));
+    ui->tableWidget->setItem(row,5,createCenterText());
+    ui->tableWidget->setItem(row,6,createCenterText());
     ui->tableWidget->setCellWidget(row,7,comboWaluta);
-    ui->tableWidget->setCellWidget(row,8,new QCheckBox());
+    ui->tableWidget->setCellWidget(row,8,checkbox);
 
 }
 
@@ -292,5 +326,11 @@ void MainWindow::on_kurseur_editingFinished()
         return;
     }
     this->kursEur=value;
+}
+
+
+void MainWindow::on_wyczyscbutton_clicked()
+{
+    MainWindow::ResetTable();
 }
 

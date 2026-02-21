@@ -8,6 +8,7 @@
 #include <QNetworkReply>
 #include <QCheckBox>
 #include <QTableWidgetItem>
+#include <QHBoxLayout>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -26,6 +27,7 @@ public:
     void updateKurs(QNetworkReply *reply);
     void onTableItemChanged(QTableWidgetItem* item);
     void CalculateOdds(int row, int col);
+    void ResetTable();
 private slots:
     void on_addButton_clicked();
 
@@ -35,6 +37,8 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_kurseur_editingFinished();
+
+    void on_wyczyscbutton_clicked();
 
 private:
     Ui::MainWindow *ui;
