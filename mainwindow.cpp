@@ -61,8 +61,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     manager->get(QNetworkRequest(QUrl("https://api.nbp.pl/api/exchangerates/rates/a/EUR/?format=JSON")));
     ui->setupUi(this);
-    ui->tableWidget->setColumnCount(9);
-    ui->tableWidget->setHorizontalHeaderLabels({"Kurs","Rzeczywisty", "Stawka","Podatek(%)","Typ","Kurs Lay","Ryzyko Lay","Waluta","Lay?"});
+    ui->tableWidget->setColumnCount(10);
+    ui->tableWidget->setHorizontalHeaderLabels({"Kurs","Rzeczywisty", "Stawka","Podatek(%)","Typ","Kurs Lay","Ryzyko Lay","Waluta","Lay?","Zysk"});
     //Tylko jeden Row Select
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -213,6 +213,7 @@ void MainWindow::calcResult(){
     //2.step Jezeli mamy Budzet zakladu to dla kazdego kursu wyliczyc stawke + dla kursow lay
     //2.1step Jezeli nie mamy bierzemy pierwszy z brzegu stawkeI do niej uzupelniamy pozostale kursy(wlacznie z lay) inny wzorek
     //Uwaga na stawke w zaleznosci od ustawien liczmy wyjsciowo liczby dla PLN a wyswietlamy wedlug ustawiedobr
+    double sumastawek = 0;
     for(int i=0;i<rows;i++){
         //getEffectiveOdd
         double effectiveOdd = ui->tableWidget->item(i,1)->text().toDouble();
@@ -262,9 +263,11 @@ void MainWindow::calcResult(){
             ui->tableWidget->blockSignals(false);
             return;
         }
+        sumastawek+=stake;
         if(waluta=="EUR"){
             stake = stake/converplntoeur;
         }
+
 
         ui->tableWidget->item(i,2)->setText(QString::number(stake));
         //Liczmy dla Lay jezeli ma kurs
@@ -281,7 +284,20 @@ void MainWindow::calcResult(){
         }
         ui->tableWidget->blockSignals(false);
     }
-
+    for(int i=0;i<rows;i++){
+        double effectiveOdd = ui->tableWidget->item(i,1)->text().toDouble();
+        double stake = ui->tableWidget->item(i,2)->text().toDouble();
+        //Stawka moze byc w eur wiec konwersja potrzebna bo sumastawek jest w PLN
+        std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,7)))->currentText().toStdString();
+        double revenue=0;
+        if(waluta=="EUR"){
+            stake = stake*this->kursEur;
+            revenue = (stake*effectiveOdd)-sumastawek;
+            revenue = revenue/this->kursEur;
+        }
+        else revenue = (stake*effectiveOdd)-sumastawek;
+        ui->tableWidget->item(i,9)->setText(QString::number(revenue));
+    } //petla jest potrzebna bo suma stawek jest potrzebna ktorej wczesniej nieznalismy
 }
 
 void MainWindow::addRow()
@@ -305,7 +321,7 @@ void MainWindow::addRow()
     ui->tableWidget->setItem(row,6,createCenterText());
     ui->tableWidget->setCellWidget(row,7,comboWaluta);
     ui->tableWidget->setCellWidget(row,8,checkbox);
-
+    ui->tableWidget->setItem(row,9,createCenterText());
 }
 
 void MainWindow::on_pushButton_2_clicked()
