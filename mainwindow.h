@@ -28,6 +28,7 @@ public:
     void onTableItemChanged(QTableWidgetItem* item);
     void CalculateOdds(int row, int col);
     void ResetTable();
+    void TryParse(int row, int col);
 private slots:
     void on_addButton_clicked();
 

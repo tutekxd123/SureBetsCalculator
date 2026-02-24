@@ -13,12 +13,34 @@ void MainWindow::CalculateOdds(int row, int col){
     ui->tableWidget->item(row,coltochange)->setText(QString::number(newvalue));
     ui->tableWidget->blockSignals(false);
 }
+std::string FindAndReplace(const std::string& stringtoparse,const std::string& stringtofind, const std::string replacestring){
+    size_t pos = stringtoparse.find(',');
+    std::string result;
+    if(pos==std::string::npos){
+        result = stringtoparse;
+        return result;
+    }
+    result = stringtoparse.substr(0,pos)+replacestring+stringtoparse.substr(pos+stringtofind.size());
+    return result;
+}
+void MainWindow::TryParse(int row,int col){
+    auto item = ui->tableWidget->item(row,col);
+    if(item==nullptr){
+        return;
+    }
+    std::string stringtoparse = ui->tableWidget->item(row,col)->text().toStdString();
+    std::string result = FindAndReplace(stringtoparse,",",".");
+    ui->tableWidget->item(row,col)->setText(QString::fromStdString(result));
+    return;
+}
 void MainWindow::onTableItemChanged(QTableWidgetItem* item){
     if(!item) return;
 
     int col = item->column();
     int row = item->row();
-
+    if(col==0 || col== 5 || col==2){
+        TryParse(row,col);
+    }
     if(col == 0 || col == 5){
         CalculateOdds(row,col);
     }
@@ -62,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent)
     manager->get(QNetworkRequest(QUrl("https://api.nbp.pl/api/exchangerates/rates/a/EUR/?format=JSON")));
     ui->setupUi(this);
     ui->tableWidget->setColumnCount(10);
-    ui->tableWidget->setHorizontalHeaderLabels({"Kurs","Rzeczywisty", "Stawka","Podatek(%)","Typ","Kurs Lay","Ryzyko Lay","Waluta","Lay?","Zysk"});
+    ui->tableWidget->setHorizontalHeaderLabels({"Kurs","Rzeczywisty", "Stawka","Podatek(%)","Typ","Kurs Lay","Stawka Lay","Waluta","Lay?","Zysk"});
     //Tylko jeden Row Select
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
