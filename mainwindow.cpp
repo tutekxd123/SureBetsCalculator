@@ -23,6 +23,13 @@ std::string FindAndReplace(const std::string& stringtoparse,const std::string& s
     result = stringtoparse.substr(0,pos)+replacestring+stringtoparse.substr(pos+stringtofind.size());
     return result;
 }
+double MainWindow::RoundTo(double number, double roundto){
+    double result = number;
+    result = result/roundto;
+    result = round(result);
+    result = result*roundto;
+    return result;
+}
 void MainWindow::TryParse(int row,int col){
     auto item = ui->tableWidget->item(row,col);
     if(item==nullptr){
@@ -164,10 +171,16 @@ void MainWindow::calcResult(){
     double firstStake = -1;
     double FirstOdd = -1;
     bool okbudzet = false;
-    double budzet = ui->BudzetInput->toPlainText().toDouble(&okbudzet);
+    double roundTo = ui->roundto->text().toDouble();
+    double budzet = ui->BudzetInput->text().toDouble(&okbudzet);
     double converplntoeur = this->kursEur;
     int LayCount = 0;
     int layRow = -1;
+    if(roundTo<=0){
+        qDebug()<<"Error roundnumber";
+        ui->tableWidget->blockSignals(false);
+        return;
+    }
     if(converplntoeur<1){
         qDebug()<<"Error EUR KURS";
         ui->tableWidget->blockSignals(false);
@@ -289,7 +302,8 @@ void MainWindow::calcResult(){
         if(waluta=="EUR"){
             stake = stake/converplntoeur;
         }
-
+        //Round To
+        //stake = MainWindow::RoundTo(stake,roundTo);
 
         ui->tableWidget->item(i,2)->setText(QString::number(stake));
         //Liczmy dla Lay jezeli ma kurs
@@ -297,6 +311,7 @@ void MainWindow::calcResult(){
             if(waluta=="EUR"){
                 libaility = libaility/converplntoeur;
             }
+            //libaility = MainWindow::RoundTo(libaility,roundTo);
             ui->tableWidget->item(i,6)->setText(QString::number(libaility));
 
         }
@@ -309,6 +324,7 @@ void MainWindow::calcResult(){
     for(int i=0;i<rows;i++){
         double effectiveOdd = ui->tableWidget->item(i,1)->text().toDouble();
         double stake = ui->tableWidget->item(i,2)->text().toDouble();
+        double libality =  ui->tableWidget->item(i,6)->text().toDouble();
         //Stawka moze byc w eur wiec konwersja potrzebna bo sumastawek jest w PLN
         std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,7)))->currentText().toStdString();
         double revenue=0;
@@ -319,7 +335,15 @@ void MainWindow::calcResult(){
         }
         else revenue = (stake*effectiveOdd)-sumastawek;
         ui->tableWidget->item(i,9)->setText(QString::number(revenue));
+        //Zakraglsmy Stake dla kazdego
+        stake = MainWindow::RoundTo(stake,roundTo);
+        ui->tableWidget->item(i,2)->setText(QString::number(stake));
+        if(libality>0){
+            libality = MainWindow::RoundTo(libality,roundTo);
+            ui->tableWidget->item(i,6)->setText(QString::number(libality));
+        }
     } //petla jest potrzebna bo suma stawek jest potrzebna ktorej wczesniej nieznalismy
+    //Zaokraglimy
 }
 
 void MainWindow::addRow()
@@ -370,5 +394,24 @@ void MainWindow::on_kurseur_editingFinished()
 void MainWindow::on_wyczyscbutton_clicked()
 {
     MainWindow::ResetTable();
+}
+
+
+void MainWindow::on_BudzetInput_editingFinished()
+{
+    //Try parse :D
+    std::string currtext = ui->BudzetInput->text().toStdString();
+    std::string result = FindAndReplace(currtext,",",".");
+    ui->BudzetInput->setText(QString::fromStdString(result));
+}
+
+
+
+
+void MainWindow::on_roundto_editingFinished()
+{
+    std::string currtext = ui->roundto->text().toStdString();
+    std::string result = FindAndReplace(currtext,",",".");
+    ui->roundto->setText(QString::fromStdString(result));
 }
 

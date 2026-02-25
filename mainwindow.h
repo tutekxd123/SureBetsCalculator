@@ -29,6 +29,7 @@ public:
     void CalculateOdds(int row, int col);
     void ResetTable();
     void TryParse(int row, int col);
+    double RoundTo(double number, double roundto);
 private slots:
     void on_addButton_clicked();
 
@@ -40,6 +41,11 @@ private slots:
     void on_kurseur_editingFinished();
 
     void on_wyczyscbutton_clicked();
+
+    void on_BudzetInput_editingFinished();
+
+
+    void on_roundto_editingFinished();
 
 private:
     Ui::MainWindow *ui;

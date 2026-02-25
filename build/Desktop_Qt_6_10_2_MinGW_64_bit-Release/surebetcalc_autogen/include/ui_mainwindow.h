@@ -16,7 +16,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTableWidget>
@@ -32,13 +31,15 @@ public:
     QPushButton *addButton;
     QPushButton *pushButton;
     QLabel *label;
-    QPlainTextEdit *BudzetInput;
     QPushButton *pushButton_2;
     QLabel *label_2;
     QLineEdit *Sumaodwrotnosci;
     QLabel *label_3;
     QLineEdit *kurseur;
     QPushButton *wyczyscbutton;
+    QLabel *label_4;
+    QLineEdit *BudzetInput;
+    QLineEdit *roundto;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -70,9 +71,6 @@ public:
         label = new QLabel(centralwidget);
         label->setObjectName("label");
         label->setGeometry(QRect(0, 330, 91, 16));
-        BudzetInput = new QPlainTextEdit(centralwidget);
-        BudzetInput->setObjectName("BudzetInput");
-        BudzetInput->setGeometry(QRect(90, 320, 111, 31));
         pushButton_2 = new QPushButton(centralwidget);
         pushButton_2->setObjectName("pushButton_2");
         pushButton_2->setGeometry(QRect(940, 270, 80, 24));
@@ -92,6 +90,15 @@ public:
         wyczyscbutton = new QPushButton(centralwidget);
         wyczyscbutton->setObjectName("wyczyscbutton");
         wyczyscbutton->setGeometry(QRect(940, 320, 80, 24));
+        label_4 = new QLabel(centralwidget);
+        label_4->setObjectName("label_4");
+        label_4->setGeometry(QRect(0, 370, 81, 16));
+        BudzetInput = new QLineEdit(centralwidget);
+        BudzetInput->setObjectName("BudzetInput");
+        BudzetInput->setGeometry(QRect(90, 320, 113, 31));
+        roundto = new QLineEdit(centralwidget);
+        roundto->setObjectName("roundto");
+        roundto->setGeometry(QRect(90, 360, 113, 31));
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
@@ -116,6 +123,8 @@ public:
         label_2->setText(QCoreApplication::translate("MainWindow", "Suma odwrotno\305\233ci:", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "KURS EURO/PLN:", nullptr));
         wyczyscbutton->setText(QCoreApplication::translate("MainWindow", "Wyczy\305\233\304\207", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "Zaokr\304\205glij do:", nullptr));
+        roundto->setText(QCoreApplication::translate("MainWindow", "0.01", nullptr));
     } // retranslateUi
 
 };
