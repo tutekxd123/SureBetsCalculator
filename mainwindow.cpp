@@ -5,7 +5,7 @@
 void MainWindow::CalculateOdds(int row, int col){
     double value = ui->tableWidget->item(row,col)->text().toDouble();
     if(value<=0) return;
-    bool laychecked = ((QCheckBox*)ui->tableWidget->cellWidget(row,8))->isChecked();
+    bool laychecked = ((QCheckBox*)ui->tableWidget->cellWidget(row,COL_LAY))->isChecked();
     if(!laychecked) return;
     double newvalue = value/(value-1);
     int coltochange = col==0? 5:0;
@@ -68,14 +68,14 @@ void MainWindow::ResetTable(){
     ui->tableWidget->item(0,3)->setText("12");
     ui->tableWidget->item(1,3)->setText("3");
     //Sets default Commision
-    ((QComboBox*)ui->tableWidget->cellWidget(0,4))->setCurrentText("Bet");
-    ((QComboBox*)ui->tableWidget->cellWidget(1,4))->setCurrentText("Win");
+    ((QComboBox*)ui->tableWidget->cellWidget(0,COL_TYPE_COMMISSION))->setCurrentText("Bet");
+    ((QComboBox*)ui->tableWidget->cellWidget(1,COL_TYPE_COMMISSION))->setCurrentText("Win");
     //Set default type Commision
-    ((QComboBox*)ui->tableWidget->cellWidget(0,7))->setCurrentText("PLN");
-    ((QComboBox*)ui->tableWidget->cellWidget(1,7))->setCurrentText("EUR");
+    ((QComboBox*)ui->tableWidget->cellWidget(0,COL_CURRENCY))->setCurrentText("PLN");
+    ((QComboBox*)ui->tableWidget->cellWidget(1,COL_CURRENCY))->setCurrentText("EUR");
     //Set Currency
 
-    ((QCheckBox*)ui->tableWidget->cellWidget(1,8))->setChecked(true);
+    ((QCheckBox*)ui->tableWidget->cellWidget(1,COL_LAY))->setChecked(true);
     ui->tableWidget->blockSignals(false);
 }
 MainWindow::MainWindow(QWidget *parent)
@@ -163,7 +163,7 @@ void MainWindow::on_pushButton_clicked()
 }
 
 void MainWindow::calcResult(){
-    ui->tableWidget->blockSignals(true);
+    ui->tableWidget->blockSignals(true); //Block Event Listener
     double suminvert =0;
     double firstStake = -1;
     double FirstOdd = -1;
@@ -185,31 +185,28 @@ void MainWindow::calcResult(){
     }
     auto rows = ui->tableWidget->rowCount();
     for(int i=0;i<rows;i++){
-        bool isLay = ((QCheckBox*)ui->tableWidget->cellWidget(i,8))->isChecked();
+        bool isLay = ((QCheckBox*)ui->tableWidget->cellWidget(i,COL_LAY))->isChecked();
         if(isLay){
             LayCount++;
             layRow = i;
         }
-        double marza = ui->tableWidget->item(i,3)->text().toDouble();
-        double commission = ui->tableWidget->item(i,3)->text().toDouble() / 100.0;
+        double marza = ui->tableWidget->item(i,COL_COMMISION)->text().toDouble();
+        double commission = marza/ 100.0;
         marza = (100-marza)/100; //marza jest odwrotonoscia!
-        double kurs =  ui->tableWidget->item(i,0)->text().toDouble();
-        double OddLay = ui->tableWidget->item(i,5)->text().toDouble();
+        double kurs =  ui->tableWidget->item(i,COL_ODD)->text().toDouble();
+        double OddLay = ui->tableWidget->item(i,COL_ODD_LAY)->text().toDouble();
         if(kurs<=0){
             qDebug()<<"Odd is incorrect";
             ui->tableWidget->blockSignals(false);
             return;
         }
-        bool CalcOddLay = ((QCheckBox*)ui->tableWidget->cellWidget(i,8))->isChecked();
+        bool CalcOddLay = ((QCheckBox*)ui->tableWidget->cellWidget(i,COL_LAY))->isChecked();
         if(OddLay>0 && CalcOddLay){
             qDebug()<<1/(OddLay-commission);
             suminvert += 1/(OddLay-commission);
         }
-        else{
-
-        }
         //Mozna juz tutaj step nr.1
-        QComboBox* marzabox =  (QComboBox*)ui->tableWidget->cellWidget(i,4);
+        QComboBox* marzabox =  (QComboBox*)ui->tableWidget->cellWidget(i,COL_TYPE_COMMISSION);
         std::string marzastring = marzabox->currentText().toStdString();
         //Read Marza
 
@@ -222,12 +219,12 @@ void MainWindow::calcResult(){
             //Podatek od Win
             oddeffective = 1+(kurs-1) * marza;
         }
-        ui->tableWidget->item(i,1)->setText(QString::number(oddeffective));
-        double stake = ui->tableWidget->item(i,2)->text().toDouble();
+        ui->tableWidget->item(i,COL_ODD_EFFECTIVE)->setText(QString::number(oddeffective));
+        double stake = ui->tableWidget->item(i,COL_ODD_STAKE)->text().toDouble();
 
         if(stake>0 && firstStake==-1){
             //Get Waluta?
-             std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,7)))->currentText().toStdString();
+             std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,COL_CURRENCY)))->currentText().toStdString();
             firstStake = stake;
             if(waluta=="EUR"){
                 firstStake = firstStake*this->kursEur;
@@ -249,10 +246,10 @@ void MainWindow::calcResult(){
     double sumastawek = 0;
     for(int i=0;i<rows;i++){
         //getEffectiveOdd
-        double effectiveOdd = ui->tableWidget->item(i,1)->text().toDouble();
-        double kurs =  ui->tableWidget->item(i,0)->text().toDouble();
-        bool CalcOddLay = ((QCheckBox*)ui->tableWidget->cellWidget(i,8))->isChecked();
-        std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,7)))->currentText().toStdString();
+        double effectiveOdd = ui->tableWidget->item(i,COL_ODD_EFFECTIVE)->text().toDouble();
+        double kurs =  ui->tableWidget->item(i,COL_ODD)->text().toDouble();
+        bool CalcOddLay = ((QCheckBox*)ui->tableWidget->cellWidget(i,COL_LAY))->isChecked();
+        std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,COL_CURRENCY)))->currentText().toStdString();
         double stake = 0;
         double libaility =  0;
         if(okbudzet){
@@ -303,14 +300,14 @@ void MainWindow::calcResult(){
         //Round To
         //stake = MainWindow::RoundTo(stake,roundTo);
 
-        ui->tableWidget->item(i,2)->setText(QString::number(stake));
+        ui->tableWidget->item(i,COL_ODD_STAKE)->setText(QString::number(stake));
         //Liczmy dla Lay jezeli ma kurs
         if(CalcOddLay){
             if(waluta=="EUR"){
                 libaility = libaility/converplntoeur;
             }
             //libaility = MainWindow::RoundTo(libaility,roundTo);
-            ui->tableWidget->item(i,6)->setText(QString::number(libaility));
+            ui->tableWidget->item(i,COL_LIBALITY_LAY)->setText(QString::number(libaility));
 
         }
         if(!okbudzet)
@@ -320,10 +317,10 @@ void MainWindow::calcResult(){
         ui->tableWidget->blockSignals(false);
     }
     for(int i=0;i<rows;i++){
-        double effectiveOdd = ui->tableWidget->item(i,1)->text().toDouble();
-        double stake = ui->tableWidget->item(i,2)->text().toDouble();
-        double libality =  ui->tableWidget->item(i,6)->text().toDouble();
-        std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,7)))->currentText().toStdString();
+        double effectiveOdd = ui->tableWidget->item(i,COL_ODD_EFFECTIVE)->text().toDouble();
+        double stake = ui->tableWidget->item(i,COL_ODD_EFFECTIVE)->text().toDouble();
+        double libality =  ui->tableWidget->item(i,COL_LIBALITY_LAY)->text().toDouble();
+        std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,COL_CURRENCY)))->currentText().toStdString();
         double revenue=0;
         if(waluta=="EUR"){
             stake = stake*this->kursEur;
@@ -331,13 +328,13 @@ void MainWindow::calcResult(){
             revenue = revenue/this->kursEur;
         }
         else revenue = (stake*effectiveOdd)-sumastawek;
-        ui->tableWidget->item(i,9)->setText(QString::number(revenue));
+        ui->tableWidget->item(i,COL_REVENUE)->setText(QString::number(revenue));
         //Zakraglsmy Stake dla kazdego
         stake = MainWindow::RoundTo(stake,roundTo);
-        ui->tableWidget->item(i,2)->setText(QString::number(stake));
+        ui->tableWidget->item(i,COL_ODD_STAKE)->setText(QString::number(stake));
         if(libality>0){
             libality = MainWindow::RoundTo(libality,roundTo);
-            ui->tableWidget->item(i,6)->setText(QString::number(libality));
+            ui->tableWidget->item(i,COL_LIBALITY_LAY)->setText(QString::number(libality));
         }
     }
 }
@@ -354,16 +351,16 @@ void MainWindow::addRow()
     auto checkbox = new QCheckBox();
     checkbox->setStyleSheet("margin-left:50%; margin-right:50%;");
     comboWaluta->addItems({"PLN","EUR"});
-    ui->tableWidget->setItem(row,0,createCenterText());
-    ui->tableWidget->setItem(row,1,createCenterText());
-    ui->tableWidget->setItem(row,2,createCenterText());
-    ui->tableWidget->setItem(row,3,createCenterText());
-    ui->tableWidget->setCellWidget(row, 4, comboTyp);
-    ui->tableWidget->setItem(row,5,createCenterText());
-    ui->tableWidget->setItem(row,6,createCenterText());
-    ui->tableWidget->setCellWidget(row,7,comboWaluta);
-    ui->tableWidget->setCellWidget(row,8,checkbox);
-    ui->tableWidget->setItem(row,9,createCenterText());
+    ui->tableWidget->setItem(row,COL_ODD,createCenterText());
+    ui->tableWidget->setItem(row,COL_ODD_EFFECTIVE,createCenterText());
+    ui->tableWidget->setItem(row,COL_ODD_STAKE,createCenterText());
+    ui->tableWidget->setItem(row,COL_COMMISION,createCenterText());
+    ui->tableWidget->setCellWidget(row, COL_TYPE_COMMISSION, comboTyp);
+    ui->tableWidget->setItem(row,COL_ODD_LAY,createCenterText());
+    ui->tableWidget->setItem(row,COL_LIBALITY_LAY,createCenterText());
+    ui->tableWidget->setCellWidget(row,COL_CURRENCY,comboWaluta);
+    ui->tableWidget->setCellWidget(row,COL_LAY,checkbox);
+    ui->tableWidget->setItem(row,COL_REVENUE,createCenterText());
 }
 
 void MainWindow::on_pushButton_2_clicked()

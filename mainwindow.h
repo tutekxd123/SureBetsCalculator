@@ -15,6 +15,19 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+enum Cols_Nums{
+    COL_ODD = 0,
+    COL_ODD_EFFECTIVE = 1,
+    COL_ODD_STAKE= 2,
+    COL_COMMISION =3,
+    COL_TYPE_COMMISSION = 4,
+    COL_ODD_LAY = 5,
+    COL_LIBALITY_LAY = 6,
+    COL_CURRENCY = 7,
+    COL_LAY = 8,
+    COL_REVENUE = 9
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
