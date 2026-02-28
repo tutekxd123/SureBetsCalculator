@@ -63,10 +63,10 @@ void MainWindow::onTableItemChanged(QTableWidgetItem* item){
 
     int col = item->column();
     int row = item->row();
-    if(col==0 || col== 5 || col==2){
+    if(col==COL_ODD || col== COL_ODD_LAY || col==COL_ODD_STAKE){
         TryParse(row,col);
     }
-    if(col == 0 || col == 5){
+    if(col == COL_ODD || col == COL_ODD_LAY){
         CalculateOdds(row,col);
     }
 }
@@ -83,8 +83,8 @@ void MainWindow::ResetTable(){
     MainWindow::addRow();
     MainWindow::addRow();
     ui->tableWidget->blockSignals(true);
-    ui->tableWidget->item(0,3)->setText("12");
-    ui->tableWidget->item(1,3)->setText("3");
+    ui->tableWidget->item(0,COL_COMMISION)->setText("12");
+    ui->tableWidget->item(1,COL_COMMISION)->setText("3");
     //Sets default Commision
     ((QComboBox*)ui->tableWidget->cellWidget(0,COL_TYPE_COMMISSION))->setCurrentText("Bet");
     ((QComboBox*)ui->tableWidget->cellWidget(1,COL_TYPE_COMMISSION))->setCurrentText("Win");
@@ -278,9 +278,9 @@ void MainWindow::calcResult(){
 
                 int backRow = (layRow == 0 ? 1 : 0);
 
-                double Kb = ui->tableWidget->item(backRow,1)->text().toDouble();
-                double Kl = ui->tableWidget->item(layRow,5)->text().toDouble();
-                double c  = ui->tableWidget->item(layRow,3)->text().toDouble()/100.0;
+                double Kb = ui->tableWidget->item(backRow,COL_ODD_EFFECTIVE)->text().toDouble();
+                double Kl = ui->tableWidget->item(layRow,COL_ODD_LAY)->text().toDouble();
+                double c  = ui->tableWidget->item(layRow,COL_COMMISION)->text().toDouble()/100.0;
 
                 double B = budzet / (1 + (Kb * (Kl - 1)) / (Kl - c));
 
