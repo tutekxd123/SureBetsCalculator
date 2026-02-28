@@ -52,7 +52,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Dodaj Mecz</string>
+     <string>Add Match</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
@@ -60,12 +60,12 @@
      <rect>
       <x>90</x>
       <y>280</y>
-      <width>80</width>
+      <width>91</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>Usuń Mecz</string>
+     <string>Remove Match</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -78,7 +78,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Budżet zakładu:</string>
+     <string>Betting Budget:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_2">
@@ -91,39 +91,13 @@
      </rect>
     </property>
     <property name="text">
-     <string>Oblicz</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>320</y>
-      <width>101</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Suma odwrotności:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="Sumaodwrotnosci">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>320</y>
-      <width>113</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
+     <string>Calculate</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>400</x>
       <y>330</y>
       <width>101</width>
       <height>16</height>
@@ -136,11 +110,14 @@
    <widget class="QLineEdit" name="kurseur">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>500</x>
       <y>320</y>
       <width>113</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="text">
+     <string>4.20</string>
     </property>
    </widget>
    <widget class="QPushButton" name="wyczyscbutton">
@@ -153,20 +130,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>Wyczyść</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>370</y>
+      <x>210</x>
+      <y>330</y>
       <width>81</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>Zaokrąglij do:</string>
+     <string>Round To:</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="BudzetInput">
@@ -182,8 +159,8 @@
    <widget class="QLineEdit" name="roundto">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>360</y>
+      <x>280</x>
+      <y>320</y>
       <width>113</width>
       <height>31</height>
      </rect>

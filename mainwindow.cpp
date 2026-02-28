@@ -61,38 +61,35 @@ void MainWindow::ResetTable(){
     }
     //Remove All Rows
 
-    //Startowe Rows!
+    //Init Tows
     MainWindow::addRow();
     MainWindow::addRow();
     ui->tableWidget->blockSignals(true);
     ui->tableWidget->item(0,3)->setText("12");
     ui->tableWidget->item(1,3)->setText("3");
-    //Ustawienie marzy domyslnej
+    //Sets default Commision
     ((QComboBox*)ui->tableWidget->cellWidget(0,4))->setCurrentText("Bet");
     ((QComboBox*)ui->tableWidget->cellWidget(1,4))->setCurrentText("Win");
-    //Ustawienie typu domyslnego
+    //Set default type Commision
     ((QComboBox*)ui->tableWidget->cellWidget(0,7))->setCurrentText("PLN");
     ((QComboBox*)ui->tableWidget->cellWidget(1,7))->setCurrentText("EUR");
-    //ustawienie walut
+    //Set Currency
 
-    //Domyslnie Lay ON
     ((QCheckBox*)ui->tableWidget->cellWidget(1,8))->setChecked(true);
     ui->tableWidget->blockSignals(false);
-    //Zmienmy wartości recznie
 }
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    //Teoretycznie powinnismy to robic w main.cpp ale i tak aplikacja jest jednostronnicowa(pobieranie kursu),najlepiej async
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     connect(manager, &QNetworkAccessManager::finished,this, &MainWindow::updateKurs);
 
     manager->get(QNetworkRequest(QUrl("https://api.nbp.pl/api/exchangerates/rates/a/EUR/?format=JSON")));
     ui->setupUi(this);
     ui->tableWidget->setColumnCount(10);
-    ui->tableWidget->setHorizontalHeaderLabels({"Kurs","Rzeczywisty", "Stawka","Podatek(%)","Typ","Kurs Lay","Stawka Lay","Waluta","Lay?","Zysk"});
-    //Tylko jeden Row Select
+    ui->tableWidget->setHorizontalHeaderLabels({"Odd","Effective", "Stake","Commision(%)","Type","Odd Lay","Libaility Lay","Currency","Lay?","Revenue"});
+
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     connect(ui->tableWidget, &QTableWidget::itemChanged,this, &MainWindow::onTableItemChanged);
@@ -116,13 +113,13 @@ void MainWindow::updateKurs(QNetworkReply* reply)
 {
     if(reply->error() != QNetworkReply::NoError)
     {
-        qDebug() << "Błąd:" << reply->errorString();
+        qDebug() << "Error:" << reply->errorString();
         reply->deleteLater();
         return;
     }
 
     QByteArray data = reply->readAll();
-    qDebug() << "Odpowiedź:" << data;
+    qDebug() << "Response:" << data;
     //Parsing Data And Update UI
     std::string stringparsing = data.toStdString();
     size_t findstring = stringparsing.find("mid");
@@ -199,7 +196,7 @@ void MainWindow::calcResult(){
         double kurs =  ui->tableWidget->item(i,0)->text().toDouble();
         double OddLay = ui->tableWidget->item(i,5)->text().toDouble();
         if(kurs<=0){
-            qDebug()<<"Kurs niepowiodl";
+            qDebug()<<"Odd is incorrect";
             ui->tableWidget->blockSignals(false);
             return;
         }
@@ -242,12 +239,13 @@ void MainWindow::calcResult(){
          qDebug()<< 1/oddeffective;
         }
     }
-    ui->Sumaodwrotnosci->setText(QString::number(suminvert));
-    //Kursy napewno są i mamy odwrotnosci ja bym podzielil to na kroki
-    //1.step Wyliczyc Kursy Efektywne dla kazdej w zalesnoci jaki TYP Marzy(TYP,WIN) JEST OK
-    //2.step Jezeli mamy Budzet zakladu to dla kazdego kursu wyliczyc stawke + dla kursow lay
-    //2.1step Jezeli nie mamy bierzemy pierwszy z brzegu stawkeI do niej uzupelniamy pozostale kursy(wlacznie z lay) inny wzorek
-    //Uwaga na stawke w zaleznosci od ustawien liczmy wyjsciowo liczby dla PLN a wyswietlamy wedlug ustawiedobr
+    //ui->Sumaodwrotnosci->setText(QString::number(suminvert));
+    //Odds is ready
+    //
+    //1.step: Calc Effective Odds including type of commision
+    //2.step: If we have a betting budget, calculate the stake for each odd, including lay odds
+    //2.1step If we don't have pick a first stake and calc betting budget using other mathematical formulas
+    //Last Convert All Stake to target Currency
     double sumastawek = 0;
     for(int i=0;i<rows;i++){
         //getEffectiveOdd
@@ -282,7 +280,7 @@ void MainWindow::calcResult(){
                 }
             }
             else if(LayCount>1){
-                qDebug()<<"Nie obslguuje wiecej nniz lay";
+                qDebug()<<"Program doesn't support more than 1 lay";
             }
             else{
                 stake = ((1/effectiveOdd)/suminvert) * budzet;
@@ -294,7 +292,7 @@ void MainWindow::calcResult(){
 
         }
         else{
-            qDebug()<<"Brak Stawki oraz budzetu";
+            qDebug()<<"Empty Stakes and betting budget";
             ui->tableWidget->blockSignals(false);
             return;
         }
@@ -325,7 +323,6 @@ void MainWindow::calcResult(){
         double effectiveOdd = ui->tableWidget->item(i,1)->text().toDouble();
         double stake = ui->tableWidget->item(i,2)->text().toDouble();
         double libality =  ui->tableWidget->item(i,6)->text().toDouble();
-        //Stawka moze byc w eur wiec konwersja potrzebna bo sumastawek jest w PLN
         std::string waluta = ((QComboBox*)(ui->tableWidget->cellWidget(i,7)))->currentText().toStdString();
         double revenue=0;
         if(waluta=="EUR"){
@@ -342,8 +339,7 @@ void MainWindow::calcResult(){
             libality = MainWindow::RoundTo(libality,roundTo);
             ui->tableWidget->item(i,6)->setText(QString::number(libality));
         }
-    } //petla jest potrzebna bo suma stawek jest potrzebna ktorej wczesniej nieznalismy
-    //Zaokraglimy
+    }
 }
 
 void MainWindow::addRow()
