@@ -17,6 +17,10 @@ Supports Two Currencies: PLN,EUR
 Automatic EUR/PLN exchange rate download from API: [LINK NBP](https://api.nbp.pl/api/exchangerates/rates/a/EUR/?format=JSON)
 
 
+$ScreenShots
+![](https://github.com/tutekxd123/SureBetsCalculator/blob/main/screenshots/screen1.png)
+![](https://github.com/tutekxd123/SureBetsCalculator/blob/main/screenshots/screen2.png)
+
 ## Getting Started
 
 ### Dependencies
