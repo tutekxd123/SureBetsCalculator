@@ -18,10 +18,22 @@
 
 #include "mainwindow.h"
 #include <QApplication>
-
+#include <QTranslator>
+#include <QLocale>
+#include <QLibraryInfo>
+using namespace Qt::StringLiterals;
 int main(int argc, char *argv[])
 {
+    QTranslator qtTranslator;
+    QString pathToLoadTrans = QString("surebetcalc_%1.ts").arg(QLocale().system().name());
+    bool loadedTranslation = qtTranslator.load(pathToLoadTrans);
+
     QApplication a(argc, argv);
+    //Load File? Translator
+    if (loadedTranslation){
+        a.installTranslator(&qtTranslator);
+
+    }
     MainWindow w;
     w.show();
     return a.exec();

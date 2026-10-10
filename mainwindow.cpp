@@ -106,8 +106,18 @@ MainWindow::MainWindow(QWidget *parent)
     manager->get(QNetworkRequest(QUrl("https://api.nbp.pl/api/exchangerates/rates/a/EUR/?format=JSON")));
     ui->setupUi(this);
     ui->tableWidget->setColumnCount(10);
-    ui->tableWidget->setHorizontalHeaderLabels({"Odd","Effective", "Stake","Commision(%)","Type","Odd Lay","Libaility Lay","Currency","Lay?","Revenue"});
-
+    ui->tableWidget->setHorizontalHeaderLabels({
+        tr("Odd"),
+        tr("Effective"),
+        tr("Stake"),
+        tr("Commission(%)"),
+        tr("Type"),
+        tr("Odd Lay"),
+        tr("Libaility Lay"),
+        tr("Currency"),
+        tr("Lay?"),
+        tr("Revenue")
+    });
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     connect(ui->tableWidget, &QTableWidget::itemChanged,this, &MainWindow::onTableItemChanged);
@@ -253,8 +263,8 @@ void MainWindow::calcResult(){
          suminvert += 1/oddeffective;
          qDebug()<< 1/oddeffective;
         }
+        ui->Sum_Invert->setText(QString::number(suminvert));
     }
-    //ui->Sumaodwrotnosci->setText(QString::number(suminvert));
     //Odds is ready
     //
     //1.step: Calc Effective Odds including type of commision
@@ -364,7 +374,7 @@ void MainWindow::addRow()
 
     // ComboBox
     auto comboTyp = new QComboBox();
-    comboTyp->addItems({"Bet","Win"});
+    comboTyp->addItems({tr("Bet"),tr("Win")});
     auto comboWaluta = new QComboBox();
     auto checkbox = new QCheckBox();
     checkbox->setStyleSheet("margin-left:50%; margin-right:50%;");
@@ -425,4 +435,6 @@ void MainWindow::on_roundto_editingFinished()
     std::string result = FindAndReplace(currtext,",",".");
     ui->roundto->setText(QString::fromStdString(result));
 }
+
+
 

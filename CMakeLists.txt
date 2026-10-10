@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(surebetcalc VERSION 0.1 LANGUAGES CXX)
-
+find_package(Qt6 COMPONENTS Core LinguistTools)
+qt_standard_project_setup(I18N_TRANSLATED_LANGUAGES pl_PL I18N_SOURCE_LANGUAGE EN)
+qt_add_translations(surebetcalc)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
